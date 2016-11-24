@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="tbInfos" class="java.util.concurrent.ConcurrentHashMap" />
+	<bean id="trigInfos" class="java.util.concurrent.ConcurrentHashMap" />
+	<bean id="curTBStatus" class="java.util.concurrent.ConcurrentHashMap" />
+	<bean id="curTrigStatus" class="java.util.concurrent.ConcurrentHashMap" />
+
+	<bean id="dbSchemaMag" class="com.caijun.em.monitor.dbschema.DBSchemaMag">
+		<constructor-arg name="jdbc" ref="jdbcTemplate" />
+		<constructor-arg name="id" ref="idGen" />
+		<constructor-arg name="dbNet" ref="dbNetMag" />
+		<constructor-arg name="tbInfos" ref="tbInfos" />
+		<constructor-arg name="trigInfos" ref="trigInfos" />
+		<constructor-arg name="curTBStatus" ref="curTBStatus" />
+		<constructor-arg name="curTrigStatus" ref="curTrigStatus" />
+	</bean>
+	<bean id="tbMetaDetector" class="com.caijun.em.monitor.dbschema.TBMetaDetector">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="curTBStatus" ref="curTBStatus" />
+	</bean>
+	<bean id="trigMetaDetector" class="com.caijun.em.monitor.dbschema.TrigMetaDetector">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="curTrigStatus" ref="curTrigStatus" />
+	</bean>
+	<bean id="tbMetaAnalyzer" class="com.caijun.em.monitor.dbschema.TBMetaAnalyzer">
+		<constructor-arg name="systore" ref="syStore" />
+	</bean>
+	<bean id="trigMetaAnalyzer" class="com.caijun.em.monitor.dbschema.TrigMetaAnalyzer">
+		<constructor-arg name="systore" ref="syStore" />
+	</bean>
+	<bean id="dbtbSchemaWatcher" class="com.caijun.em.monitor.dbschema.DBTBSchemaWatcher">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="tbMetaDetector" ref="tbMetaDetector" />
+		<constructor-arg name="tbMetaAnalyzer" ref="tbMetaAnalyzer" />
+	</bean>
+	<bean id="dbtrigSchemaWatcher" class="com.caijun.em.monitor.dbschema.DBTrigSchemaWatcher">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="trigMetaDetector" ref="trigMetaDetector" />
+		<constructor-arg name="trigMetaAnalyzer" ref="trigMetaAnalyzer" />
+	</bean>
+
+</beans>

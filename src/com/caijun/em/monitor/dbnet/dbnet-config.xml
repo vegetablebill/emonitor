@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="dbInfos" class="java.util.concurrent.ConcurrentHashMap" />
+	<bean id="curDBStatus" class="java.util.concurrent.ConcurrentHashMap" />
+	<bean id="dss" class="java.util.concurrent.ConcurrentHashMap" />
+	<bean id="jdbcs" class="java.util.concurrent.ConcurrentHashMap" />
+
+	<bean id="dbNetMag" class="com.caijun.em.monitor.dbnet.DBNetMag">
+		<constructor-arg name="jdbc" ref="jdbcTemplate" />
+		<constructor-arg name="curStatus" ref="curDBStatus" />
+		<constructor-arg name="dbInfos" ref="dbInfos" />
+		<constructor-arg name="dss" ref="dss" />
+		<constructor-arg name="jdbcs" ref="jdbcs" />
+	</bean>
+	<bean id="dbNetDetector" class="com.caijun.em.monitor.dbnet.DBNetDetector">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="curStatus" ref="curDBStatus" />
+	</bean>
+	<bean id="dbConnShakeAnalyzer" class="com.caijun.em.monitor.dbnet.DBConnShakeAnalyzer">
+		<constructor-arg name="systore" ref="syStore" />
+	</bean>
+	<bean id="dbDisConnAnalyzer" class="com.caijun.em.monitor.dbnet.DBDisConnAnalyzer">
+		<constructor-arg name="systore" ref="syStore" />
+	</bean>
+	<bean id="dbNetWatcher" class="com.caijun.em.monitor.dbnet.DBNetWatcher">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="dbNetDetector" ref="dbNetDetector" />
+		<constructor-arg name="dbDisConnAnalyzer" ref="dbDisConnAnalyzer" />
+		<constructor-arg name="dbConnShakeAnalyzer" ref="dbConnShakeAnalyzer" />
+	</bean>
+</beans>

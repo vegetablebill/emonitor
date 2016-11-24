@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+    <property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+    <property name="jdbcUrl" value="jdbc:oracle:thin:localhost:1521:orcl"/>
+    <property name="user" value="emonit"/>
+    <property name="password" value="emonit"/>
+    <property name="minPoolSize" value="3"/>  
+    <property name="maxPoolSize" value="30"/>     
+    <property name="initialPoolSize" value="3"/>
+    <property name="maxIdleTime" value="60"/>
+    <property name="acquireIncrement" value="3"/>   
+    <property name="idleConnectionTestPeriod" value="60"/>  
+    <property name="acquireRetryAttempts" value="10"/>
+</bean>
+<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+	<property name="dataSource" ref="dataSource"></property>
+</bean>
+</beans>

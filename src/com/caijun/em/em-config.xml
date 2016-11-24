@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="props" class="com.caijun.em.Props">
+		<constructor-arg name="jdbc" ref="jdbcTemplate" />
+	</bean>
+	<bean id="idGen" class="com.caijun.em.IDGen">
+		<constructor-arg name="jdbc" ref="jdbcTemplate" />
+		<constructor-arg name="props" ref="props" />
+	</bean>
+	<bean id="syStore" class="com.caijun.em.Systore">
+		<constructor-arg name="jdbc" ref="jdbcTemplate" />
+		<constructor-arg name="props" ref="props" />
+		<constructor-arg name="id" ref="idGen" />
+		<constructor-arg name="dbNet" ref="dbNetMag" />
+		<constructor-arg name="dbSchema" ref="dbSchemaMag" />
+	</bean>
+</beans>

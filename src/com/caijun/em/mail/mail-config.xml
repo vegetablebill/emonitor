@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<bean id="MSender" class="com.caijun.em.mail.MSender">
+<property name="systore" ref="syStore"/>
+</bean>
+<bean id="sendMailWatcher" class="com.caijun.em.mail.SendMailWatcher">
+<constructor-arg name="systore" ref="syStore"/>
+</bean>
+</beans>
