@@ -14,21 +14,24 @@ import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.caijun.em.Props;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class DBNetMag {
+	private static String CENTER_ID = "area.centerID";
 	private Logger logger = Logger.getLogger("dbnet");
 	private JdbcTemplate jdbc;
+	private Props props;
 	private Map<Long, DBStatus> curStatus;
 	private Map<Long, DBInfo> dbInfosCache;
 	private Map<Long, DataSource> dscache;
 	private Map<Long, JdbcTemplate> jdbcCache;
 
-	public DBNetMag(JdbcTemplate jdbc, Map<Long, DBStatus> curStatus,
-			Map<Long, DBInfo> dbInfos, Map<Long, DataSource> dss,
-			Map<Long, JdbcTemplate> jdbcs) {
+	public DBNetMag(JdbcTemplate jdbc, Props props, Map<Long, DBStatus> curStatus, Map<Long, DBInfo> dbInfos,
+			Map<Long, DataSource> dss, Map<Long, JdbcTemplate> jdbcs) {
 		super();
 		this.jdbc = jdbc;
+		this.props = props;
 		dbInfosCache = dbInfos;
 		dscache = dss;
 		jdbcCache = jdbcs;
@@ -51,6 +54,10 @@ public class DBNetMag {
 
 	public DBInfo getDBInfo(long id) {
 		return dbInfosCache.get(id);
+	}
+
+	public DBInfo getCenterDBInfo() {
+		return getDBInfo(props.get(CENTER_ID, 0));
 	}
 
 	public DataSource getDS(long dbid) {
@@ -82,6 +89,11 @@ public class DBNetMag {
 		return dbStatus.isDisconn();
 	}
 
+	public boolean centerIsDisconn() {
+		DBStatus dbStatus = getCurDBStatus(props.get(CENTER_ID, 0));
+		return dbStatus.isDisconn();
+	}
+
 	public boolean isDisconn(DBInfo dbInfo) {
 		return isDisconn(dbInfo.getId());
 	}
@@ -90,11 +102,21 @@ public class DBNetMag {
 		return new ArrayList<DBStatus>(curStatus.values());
 	}
 
-	public List<DBStatus> getAllDisconnDBStatus() {
-		List<DBStatus> result = new ArrayList<DBStatus>();
+	public List<DBInfo> getAllDisconnDBInfo() {
+		List<DBInfo> result = new ArrayList<DBInfo>();
 		for (DBStatus dbStatus : curStatus.values()) {
 			if (dbStatus.isDisconn()) {
-				result.add(dbStatus);
+				result.add(this.getDBInfo(dbStatus.getDbid()));
+			}
+		}
+		return result;
+	}
+
+	public List<DBInfo> getAllConnDBInfo() {
+		List<DBInfo> result = new ArrayList<DBInfo>();
+		for (DBStatus dbStatus : curStatus.values()) {
+			if (!dbStatus.isDisconn()) {
+				result.add(this.getDBInfo(dbStatus.getDbid()));
 			}
 		}
 		return result;
@@ -128,8 +150,7 @@ public class DBNetMag {
 
 	private void load_dbInfosCache() {
 		dbInfosCache.clear();
-		List<DBInfo> dbInfos = jdbc.query(
-				"select id,aid,url,usr,pasword from dbs", new DBInfoMapper());
+		List<DBInfo> dbInfos = jdbc.query("select id,aid,url,usr,pasword from dbs", new DBInfoMapper());
 		for (DBInfo dbInfo : dbInfos) {
 			dbInfosCache.put(dbInfo.getId(), dbInfo);
 		}
@@ -154,9 +175,7 @@ public class DBNetMag {
 	}
 
 	private void load_curdbstatus() {
-		List<DBStatus> list = jdbc.query(
-				"select id,dbid,disconn,ct from dbstatus_newly",
-				new DBStatusMapper());
+		List<DBStatus> list = jdbc.query("select id,dbid,disconn,ct from dbstatus_newly", new DBStatusMapper());
 		for (DBStatus dbStatus : list) {
 			curStatus.put(dbStatus.getDbid(), dbStatus);
 		}

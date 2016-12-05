@@ -21,7 +21,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import com.caijun.em.Area;
 import com.caijun.em.Systore;
 import com.caijun.em.monitor.dbnet.DBInfo;
-import com.caijun.em.monitor.dbnet.DBStatus;
 import com.caijun.utils.str.StringUtil;
 import com.tongtech.cj.dbMeta.TrigMeta;
 import com.tongtech.cj.dbMeta.TrigMetaComparer;
@@ -38,36 +37,24 @@ public class TrigMetaDetector {
 	}
 
 	public void sampling(boolean withStruct) {
-		List<DBStatus> disconns = systore.dbNet.getAllDisconnDBStatus();
 		List<TrigStatus> trigststus = new ArrayList<TrigStatus>();
 		List<TrigInfo> trigInfos = new ArrayList<TrigInfo>();
 
-		boolean flag = false;
 		for (TrigInfo trigInfo : systore.dbSchema.getTrigInfos()) {
-			for (DBStatus disconn : disconns) {
-				if (trigInfo.getDbid() == disconn.getDbid()) {
-					flag = true;
-					break;
-				}
-			}
-			if (!flag) {
+			if (!systore.dbNet.isDisconn(trigInfo.getDbid())) {
 				trigInfos.add(trigInfo);
 			}
-			flag = false;
 		}
 
 		if (logger.isDebugEnabled()) {
-			for (DBStatus disconn : disconns) {
-				DBInfo dbInfo = systore.dbNet.getDBInfo(disconn.getDbid());
-				Area area = systore.getArea(dbInfo.getAid());
-				logger.debug("[" + area.getName() + "]数据库[" + dbInfo.getUrl()
-						+ "]连接异常,不能获得触发器结构状态.");
+			for (DBInfo disconn : systore.dbNet.getAllDisconnDBInfo()) {
+				Area area = systore.getArea(disconn.getAid());
+				logger.debug("[" + area.getName() + "]数据库[" + disconn.getUrl() + "]连接异常,不能获得触发器结构状态.");
 			}
 		}
 
 		ExecutorService threadPool = Executors.newFixedThreadPool(8);
-		CompletionService<TrigStatus> completionService = new ExecutorCompletionService<TrigStatus>(
-				threadPool);
+		CompletionService<TrigStatus> completionService = new ExecutorCompletionService<TrigStatus>(threadPool);
 		for (TrigInfo TrigInfo : trigInfos) {
 			completionService.submit(new TrigStatusGetor(TrigInfo, withStruct));
 		}
@@ -90,16 +77,12 @@ public class TrigMetaDetector {
 			boolean dropped = false;
 			boolean disabled = false;
 			String result = systore.dbNet.getJdbc(trigInfo.getDbid()).query(
-					"select status from all_triggers where owner='"
-							+ StringUtil.toUpperCase(trigInfo.getSchema())
-							+ "' and NLS_UPPER(table_name)='"
-							+ StringUtil.toUpperCase(trigInfo.getTbName())
-							+ "' and NLS_UPPER(trigger_name)='"
-							+ StringUtil.toUpperCase(trigInfo.getTrigName())
-							+ "'", new ResultSetExtractor<String>() {
+					"select status from all_triggers where owner='" + StringUtil.toUpperCase(trigInfo.getSchema())
+							+ "' and NLS_UPPER(table_name)='" + StringUtil.toUpperCase(trigInfo.getTbName())
+							+ "' and NLS_UPPER(trigger_name)='" + StringUtil.toUpperCase(trigInfo.getTrigName()) + "'",
+					new ResultSetExtractor<String>() {
 						@Override
-						public String extractData(ResultSet rs)
-								throws SQLException, DataAccessException {
+						public String extractData(ResultSet rs) throws SQLException, DataAccessException {
 							if (rs.next()) {
 								return rs.getString(1);
 							}
@@ -115,9 +98,8 @@ public class TrigMetaDetector {
 
 			TrigStatus trigStatus = new TrigStatus();
 			if (!dropped && withStruct) {
-				trigStatus.setStrcut(new TrigMeta(trigInfo.getSchema(),
-						trigInfo.getTrigName(), systore.dbNet.getDS(trigInfo
-								.getDbid())));
+				trigStatus.setStrcut(new TrigMeta(trigInfo.getSchema(), trigInfo.getTrigName(),
+						systore.dbNet.getDS(trigInfo.getDbid())));
 			}
 			trigStatus.setTrigid(trigInfo.getId());
 			trigStatus.setDroped(dropped);
@@ -126,10 +108,8 @@ public class TrigMetaDetector {
 			trigStatus.setId(systore.id.getNext());
 			return trigStatus;
 		} catch (Exception e) {
-			logger.error(
-					"[" + trigInfo.getDbid() + "]不能获得触发器["
-							+ trigInfo.getSchema() + "." + trigInfo.getTbName()
-							+ "." + trigInfo.getTrigName() + "]结构状态.", e);
+			logger.error("[" + trigInfo.getDbid() + "]不能获得触发器[" + trigInfo.getSchema() + "." + trigInfo.getTbName()
+					+ "." + trigInfo.getTrigName() + "]结构状态.", e);
 			return null;
 		}
 	}
@@ -138,15 +118,13 @@ public class TrigMetaDetector {
 		final List<TrigStatus> newStatus = new ArrayList<TrigStatus>();
 		for (TrigStatus a : list) {
 			TrigStatus b = curStatus.get(a.getTrigid());
-			if (b == null || b.isDroped() != a.isDroped()
-					|| b.isDisabled() != a.isDisabled()) {
+			if (b == null || b.isDroped() != a.isDroped() || b.isDisabled() != a.isDisabled()) {
 				if (!withStruct && b != null) {
 					a.setStrcut(b.getStrcut());
 				}
 				curStatus.put(a.getTrigid(), a);
 				newStatus.add(a);
-			} else if (withStruct
-					&& !TrigMetaComparer.compare(a.getStrcut(), b.getStrcut())) {
+			} else if (withStruct && !TrigMetaComparer.compare(a.getStrcut(), b.getStrcut())) {
 				curStatus.put(a.getTrigid(), a);
 				newStatus.add(a);
 			}
@@ -156,34 +134,28 @@ public class TrigMetaDetector {
 			return;
 		}
 
-		systore.jdbc
-				.batchUpdate(
-						"insert into trigerstatus(id,trigid,struct,disabled,droped,ct) values(?,?,?,?,?,?)",
-						new BatchPreparedStatementSetter() {
-							@Override
-							public void setValues(PreparedStatement ps, int i)
-									throws SQLException {
-								ps.setLong(1, newStatus.get(i).getId());
-								ps.setLong(2, newStatus.get(i).getTrigid());
-								TrigMeta meta = newStatus.get(i).getStrcut();
-								if (meta == null) {
-									ps.setString(3, null);
-								} else {
-									ps.setString(3, meta.toXML());
-								}
-								ps.setInt(4, newStatus.get(i).isDisabled() ? 1
-										: 0);
-								ps.setInt(5, newStatus.get(i).isDroped() ? 1
-										: 0);
-								ps.setTimestamp(6, new java.sql.Timestamp(
-										newStatus.get(i).getCt().getTime()));
-							}
+		systore.jdbc.batchUpdate("insert into trigerstatus(id,trigid,struct,disabled,droped,ct) values(?,?,?,?,?,?)",
+				new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						ps.setLong(1, newStatus.get(i).getId());
+						ps.setLong(2, newStatus.get(i).getTrigid());
+						TrigMeta meta = newStatus.get(i).getStrcut();
+						if (meta == null) {
+							ps.setString(3, null);
+						} else {
+							ps.setString(3, meta.toXML());
+						}
+						ps.setInt(4, newStatus.get(i).isDisabled() ? 1 : 0);
+						ps.setInt(5, newStatus.get(i).isDroped() ? 1 : 0);
+						ps.setTimestamp(6, new java.sql.Timestamp(newStatus.get(i).getCt().getTime()));
+					}
 
-							@Override
-							public int getBatchSize() {
-								return newStatus.size();
-							}
-						});
+					@Override
+					public int getBatchSize() {
+						return newStatus.size();
+					}
+				});
 
 	}
 

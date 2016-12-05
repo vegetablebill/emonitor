@@ -30,9 +30,8 @@ public class DBSchemaMag {
 	private Map<Long, TBStatus> curTBStatus;
 	private Map<Long, TrigStatus> curTrigStatus;
 
-	public DBSchemaMag(JdbcTemplate jdbc, IDGen id, DBNetMag dbNet,
-			Map<Long, TBInfo> tbInfos, Map<Long, TrigInfo> trigInfos,
-			Map<Long, TBStatus> curTBStatus, Map<Long, TrigStatus> curTrigStatus) {
+	public DBSchemaMag(JdbcTemplate jdbc, IDGen id, DBNetMag dbNet, Map<Long, TBInfo> tbInfos,
+			Map<Long, TrigInfo> trigInfos, Map<Long, TBStatus> curTBStatus, Map<Long, TrigStatus> curTrigStatus) {
 		super();
 		this.jdbc = jdbc;
 		this.id = id;
@@ -58,6 +57,16 @@ public class DBSchemaMag {
 		return new ArrayList<TBInfo>(tbInfosCache.values());
 	}
 
+	public List<TBInfo> getTBInfosOfDB(long dbid) {
+		List<TBInfo> rs = new ArrayList<TBInfo>();
+		for (TBInfo tbInfo : tbInfosCache.values()) {
+			if (tbInfo.getDbid() == dbid) {
+				rs.add(tbInfo);
+			}
+		}
+		return rs;
+	}
+
 	public List<TrigInfo> getTrigInfos() {
 		return new ArrayList<TrigInfo>(trigInfosCache.values());
 	}
@@ -70,8 +79,7 @@ public class DBSchemaMag {
 		schema = StringUtil.toLowerCase(StringUtil.trimDown(schema));
 		tbName = StringUtil.toLowerCase(StringUtil.trimDown(tbName));
 		for (TBInfo tbInfo : tbInfosCache.values()) {
-			if (tbInfo.getDbid() == dbid
-					&& StringUtil.equals(tbInfo.getSchema(), schema)
+			if (tbInfo.getDbid() == dbid && StringUtil.equals(tbInfo.getSchema(), schema)
 					&& StringUtil.equals(tbInfo.getName(), tbName)) {
 				return tbInfo;
 			}
@@ -83,8 +91,8 @@ public class DBSchemaMag {
 	public void removeTBInfo(long dbid, String schema, String tbName) {
 		schema = StringUtil.toLowerCase(StringUtil.trimDown(schema));
 		tbName = StringUtil.toLowerCase(StringUtil.trimDown(tbName));
-		jdbc.execute("delete from TBS where dbid=" + dbid + "and tbschema='"
-				+ schema + "' and tbname='" + tbName + "'");
+		jdbc.execute(
+				"delete from TBS where dbid=" + dbid + "and tbschema='" + schema + "' and tbname='" + tbName + "'");
 		TBInfo tbInfo = getTBInfo(dbid, schema, tbName);
 		if (tbInfo != null) {
 			tbInfosCache.remove(tbInfo.getId());
@@ -100,8 +108,7 @@ public class DBSchemaMag {
 		tbName = StringUtil.toLowerCase(StringUtil.trimDown(tbName));
 		List<TrigInfo> result = new ArrayList<TrigInfo>();
 		for (TrigInfo trigInfo : trigInfosCache.values()) {
-			if (trigInfo.getDbid() == dbid
-					&& StringUtil.equals(trigInfo.getSchema(), schema)
+			if (trigInfo.getDbid() == dbid && StringUtil.equals(trigInfo.getSchema(), schema)
 					&& StringUtil.equals(trigInfo.getTbName(), tbName)
 					&& StringUtil.equals(trigInfo.getTrigName(), tbName)) {
 				result.add(trigInfo);
@@ -114,8 +121,7 @@ public class DBSchemaMag {
 		schema = StringUtil.toLowerCase(StringUtil.trimDown(schema));
 		trigName = StringUtil.toLowerCase(StringUtil.trimDown(trigName));
 		for (TrigInfo trigInfo : trigInfosCache.values()) {
-			if (trigInfo.getDbid() == dbid
-					&& StringUtil.equals(trigInfo.getSchema(), schema)
+			if (trigInfo.getDbid() == dbid && StringUtil.equals(trigInfo.getSchema(), schema)
 					&& StringUtil.equals(trigInfo.getTrigName(), trigName)) {
 				return trigInfo;
 			}
@@ -126,8 +132,8 @@ public class DBSchemaMag {
 	public void removeTrigInfo(long dbid, String schema, String trigName) {
 		schema = StringUtil.toLowerCase(StringUtil.trimDown(schema));
 		trigName = StringUtil.toLowerCase(StringUtil.trimDown(trigName));
-		jdbc.execute("delete from trigers where dbid=" + dbid + "and tschema='"
-				+ schema + "' and trigname='" + trigName + "'");
+		jdbc.execute("delete from trigers where dbid=" + dbid + "and tschema='" + schema + "' and trigname='" + trigName
+				+ "'");
 		TrigInfo trigInfo = getTrigInfo(dbid, schema, trigName);
 		if (trigInfo != null) {
 			trigInfosCache.remove(trigInfo.getId());
@@ -147,9 +153,8 @@ public class DBSchemaMag {
 			TBInfo tbInfo = getTBInfo(dbid, schema, tbName);
 			Date ct = new Date();
 			if (tbInfo != null) {
-				this.jdbc
-						.update("update TBS set dbid=?,tbschema=?,tbname=?, STRUCT=?,ct=? where id = ?",
-								new UpdateTBInfoPSS(tbInfo, tbMeta, ct));
+				this.jdbc.update("update TBS set dbid=?,tbschema=?,tbname=?, STRUCT=?,ct=? where id = ?",
+						new UpdateTBInfoPSS(tbInfo, tbMeta, ct));
 				tbInfo.setStrcut(tbMeta);
 				tbInfo.setCt(ct);
 			} else {
@@ -160,9 +165,8 @@ public class DBSchemaMag {
 				tbInfo.setName(tbName);
 				tbInfo.setStrcut(tbMeta);
 				tbInfo.setCt(ct);
-				this.jdbc
-						.update("insert into TBS(id,dbid,tbschema,tbname,struct,ct) values(?,?,?,?,?,?)",
-								new InsertTBInfoPSS(tbInfo));
+				this.jdbc.update("insert into TBS(id,dbid,tbschema,tbname,struct,ct) values(?,?,?,?,?,?)",
+						new InsertTBInfoPSS(tbInfo));
 				tbInfosCache.put(tbInfo.getId(), tbInfo);
 			}
 			return tbInfo;
@@ -198,8 +202,7 @@ public class DBSchemaMag {
 		return new ArrayList<TrigStatus>(curTrigStatus.values());
 	}
 
-	public TrigInfo loadTrigInfo(long dbid, String schema, String tbName,
-			String trigName) {
+	public TrigInfo loadTrigInfo(long dbid, String schema, String tbName, String trigName) {
 		schema = StringUtil.toLowerCase(StringUtil.trimDown(schema));
 		tbName = StringUtil.toLowerCase(StringUtil.trimDown(tbName));
 		trigName = StringUtil.toLowerCase(StringUtil.trimDown(trigName));
@@ -208,8 +211,7 @@ public class DBSchemaMag {
 		try {
 			trigMeta = new TrigMeta(schema, trigName, dbNet.getDS(dbid));
 		} catch (DBMetaException e) {
-			logger.error("解析[" + schema + "." + tbName + "." + trigName
-					+ "]异常.", e);
+			logger.error("解析[" + schema + "." + tbName + "." + trigName + "]异常.", e);
 			removeTrigInfo(dbid, schema, trigName);
 			return null;
 		}
@@ -217,9 +219,8 @@ public class DBSchemaMag {
 			TrigInfo trigInfo = getTrigInfo(dbid, schema, trigName);
 			Date ct = new Date();
 			if (trigInfo != null) {
-				this.jdbc
-						.update("update trigers set dbid=?,tschema=?,tbname=?,trigname=?, STRUCT=?,ct=? where id = ?",
-								new UpdateTrigInfoPSS(trigInfo, trigMeta, ct));
+				this.jdbc.update("update trigers set dbid=?,tschema=?,tbname=?,trigname=?, STRUCT=?,ct=? where id = ?",
+						new UpdateTrigInfoPSS(trigInfo, trigMeta, ct));
 				trigInfo.setStrcut(trigMeta);
 				trigInfo.setCt(ct);
 			} else {
@@ -231,15 +232,13 @@ public class DBSchemaMag {
 				trigInfo.setTrigName(trigName);
 				trigInfo.setStrcut(trigMeta);
 				trigInfo.setCt(ct);
-				this.jdbc
-						.update("insert into trigers(id,dbid,tschema,tbname,trigname,struct,ct) values(?,?,?,?,?,?,?)",
-								new InsertTrigInfoPSS(trigInfo));
+				this.jdbc.update("insert into trigers(id,dbid,tschema,tbname,trigname,struct,ct) values(?,?,?,?,?,?,?)",
+						new InsertTrigInfoPSS(trigInfo));
 				trigInfosCache.put(trigInfo.getId(), trigInfo);
 			}
 			return trigInfo;
 		} catch (Exception e) {
-			logger.error("保存[" + schema + "." + tbName + "." + trigName
-					+ "]元信息异常.", e);
+			logger.error("保存[" + schema + "." + tbName + "." + trigName + "]元信息异常.", e);
 			return null;
 		}
 	}
@@ -314,8 +313,7 @@ public class DBSchemaMag {
 			} else {
 				ps.setString(6, trigInfo.getStrcut().toXML());
 			}
-			ps.setTimestamp(7, new java.sql.Timestamp(trigInfo.getCt()
-					.getTime()));
+			ps.setTimestamp(7, new java.sql.Timestamp(trigInfo.getCt().getTime()));
 		}
 	}
 
@@ -349,9 +347,7 @@ public class DBSchemaMag {
 
 	private void load_tbinfosCache() {
 		tbInfosCache.clear();
-		List<TBInfo> tbInfos = jdbc.query(
-				"select id,dbid,tbschema,tbname,struct,ct from tbs",
-				new TBInfoMapper());
+		List<TBInfo> tbInfos = jdbc.query("select id,dbid,tbschema,tbname,struct,ct from tbs", new TBInfoMapper());
 		for (TBInfo tbInfo : tbInfos) {
 			tbInfosCache.put(tbInfo.getId(), tbInfo);
 		}
@@ -363,10 +359,8 @@ public class DBSchemaMag {
 			try {
 				tbInfo.setId(rs.getLong("id"));
 				tbInfo.setDbid(rs.getLong("dbid"));
-				tbInfo.setSchema(StringUtil.toLowerCase(StringUtil.trimDown(rs
-						.getString("tbschema"))));
-				tbInfo.setName(StringUtil.toLowerCase(StringUtil.trimDown(rs
-						.getString("tbname"))));
+				tbInfo.setSchema(StringUtil.toLowerCase(StringUtil.trimDown(rs.getString("tbschema"))));
+				tbInfo.setName(StringUtil.toLowerCase(StringUtil.trimDown(rs.getString("tbname"))));
 				tbInfo.setCt(new Date(rs.getTimestamp("ct").getTime()));
 				String xml = StringUtil.trimDown(rs.getString("struct"));
 				if (xml != null) {
@@ -375,9 +369,7 @@ public class DBSchemaMag {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} catch (DBMetaException e) {
-				logger.error(
-						"解析[" + tbInfo.getSchema() + "." + tbInfo.getName()
-								+ "]异常.", e);
+				logger.error("解析[" + tbInfo.getSchema() + "." + tbInfo.getName() + "]异常.", e);
 			}
 			return tbInfo;
 		}
@@ -385,9 +377,8 @@ public class DBSchemaMag {
 
 	private void load_triginfosCache() {
 		trigInfosCache.clear();
-		List<TrigInfo> trigInfos = jdbc
-				.query("select id,dbid,tschema ,tbname,trigname,struct,ct from trigers",
-						new TrigInfoMapper());
+		List<TrigInfo> trigInfos = jdbc.query("select id,dbid,tschema ,tbname,trigname,struct,ct from trigers",
+				new TrigInfoMapper());
 		for (TrigInfo trigInfo : trigInfos) {
 			trigInfosCache.put(trigInfo.getId(), trigInfo);
 		}
@@ -399,12 +390,9 @@ public class DBSchemaMag {
 			try {
 				trigInfo.setId(rs.getLong("id"));
 				trigInfo.setDbid(rs.getLong("dbid"));
-				trigInfo.setSchema(StringUtil.toLowerCase(StringUtil
-						.trimDown(rs.getString("tschema"))));
-				trigInfo.setTbName(StringUtil.toLowerCase(StringUtil
-						.trimDown(rs.getString("tbname"))));
-				trigInfo.setTrigName(StringUtil.toLowerCase(StringUtil
-						.trimDown(rs.getString("trigname"))));
+				trigInfo.setSchema(StringUtil.toLowerCase(StringUtil.trimDown(rs.getString("tschema"))));
+				trigInfo.setTbName(StringUtil.toLowerCase(StringUtil.trimDown(rs.getString("tbname"))));
+				trigInfo.setTrigName(StringUtil.toLowerCase(StringUtil.trimDown(rs.getString("trigname"))));
 				trigInfo.setCt(new Date(rs.getTimestamp("ct").getTime()));
 				String xml = StringUtil.trimDown(rs.getString("struct"));
 				if (xml != null) {
@@ -413,19 +401,15 @@ public class DBSchemaMag {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} catch (DBMetaException e) {
-				logger.error(
-						"解析[" + trigInfo.getSchema() + "."
-								+ trigInfo.getTbName() + "."
-								+ trigInfo.getTrigName() + "]异常.", e);
+				logger.error("解析[" + trigInfo.getSchema() + "." + trigInfo.getTbName() + "." + trigInfo.getTrigName()
+						+ "]异常.", e);
 			}
 			return trigInfo;
 		}
 	}
 
 	private void load_tbstatusCache() {
-		List<TBStatus> list = jdbc.query(
-				"select id,tbid,struct,droped,ct from tbstatus_newly",
-				new TBStatusMapper());
+		List<TBStatus> list = jdbc.query("select id,tbid,struct,droped,ct from tbstatus_newly", new TBStatusMapper());
 		for (TBStatus TBStatus : list) {
 			curTBStatus.put(TBStatus.getTbid(), TBStatus);
 		}
@@ -444,8 +428,7 @@ public class DBSchemaMag {
 					tbStatus.setDroped(true);
 				}
 				if (!tbStatus.isDroped()) {
-					TBMeta meta = new TBMeta(StringUtil.trimDown(rs
-							.getString("struct")));
+					TBMeta meta = new TBMeta(StringUtil.trimDown(rs.getString("struct")));
 					tbStatus.setStrcut(meta);
 				}
 				tbStatus.setCt(rs.getTimestamp("ct"));
@@ -459,9 +442,8 @@ public class DBSchemaMag {
 	}
 
 	private void load_trigstatusCache() {
-		List<TrigStatus> list = jdbc
-				.query("select id,trigid,struct,disabled,droped,ct from trigerstatus_newly",
-						new TrigStatusMapper());
+		List<TrigStatus> list = jdbc.query("select id,trigid,struct,disabled,droped,ct from trigerstatus_newly",
+				new TrigStatusMapper());
 		for (TrigStatus trigStatus : list) {
 			curTrigStatus.put(trigStatus.getTrigid(), trigStatus);
 		}
@@ -487,8 +469,7 @@ public class DBSchemaMag {
 				}
 
 				if (!trigStatus.isDroped()) {
-					TrigMeta meta = new TrigMeta(StringUtil.trimDown(rs
-							.getString("struct")));
+					TrigMeta meta = new TrigMeta(StringUtil.trimDown(rs.getString("struct")));
 					trigStatus.setStrcut(meta);
 				}
 				trigStatus.setCt(rs.getTimestamp("ct"));

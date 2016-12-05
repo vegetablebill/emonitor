@@ -9,6 +9,7 @@
 
 	<bean id="dbNetMag" class="com.caijun.em.monitor.dbnet.DBNetMag">
 		<constructor-arg name="jdbc" ref="jdbcTemplate" />
+		<constructor-arg name="props" ref="props" />
 		<constructor-arg name="curStatus" ref="curDBStatus" />
 		<constructor-arg name="dbInfos" ref="dbInfos" />
 		<constructor-arg name="dss" ref="dss" />
