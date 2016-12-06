@@ -26,6 +26,8 @@ public class DBNetMag {
 	private Map<Long, DBInfo> dbInfosCache;
 	private Map<Long, DataSource> dscache;
 	private Map<Long, JdbcTemplate> jdbcCache;
+	private DBInfo centerDBInfo;
+	private long centerAreaID = -1L;
 
 	public DBNetMag(JdbcTemplate jdbc, Props props, Map<Long, DBStatus> curStatus, Map<Long, DBInfo> dbInfos,
 			Map<Long, DataSource> dss, Map<Long, JdbcTemplate> jdbcs) {
@@ -57,7 +59,17 @@ public class DBNetMag {
 	}
 
 	public DBInfo getCenterDBInfo() {
-		return getDBInfo(props.get(CENTER_ID, 0));
+		long centerAreaID = props.get(CENTER_ID, 0);
+		if (this.centerAreaID != centerAreaID) {
+			for (DBInfo dbInfo : dbInfosCache.values()) {
+				if (centerAreaID == dbInfo.getAid()) {
+					centerDBInfo = dbInfo;
+					this.centerAreaID = centerAreaID;
+					break;
+				}
+			}
+		}
+		return centerDBInfo;
 	}
 
 	public DataSource getDS(long dbid) {
@@ -90,7 +102,7 @@ public class DBNetMag {
 	}
 
 	public boolean centerIsDisconn() {
-		DBStatus dbStatus = getCurDBStatus(props.get(CENTER_ID, 0));
+		DBStatus dbStatus = getCurDBStatus(getCenterDBInfo());
 		return dbStatus.isDisconn();
 	}
 
