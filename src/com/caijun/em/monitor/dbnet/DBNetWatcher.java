@@ -44,16 +44,16 @@ public class DBNetWatcher {
 
 	public void start() {
 		lock.tryLock();
-		logger.info("Æô¶¯Êı¾İ¿âÍøÂç¼à¿Ø...");
+		logger.info("å¯åŠ¨æ•°æ®åº“ç½‘ç»œç›‘æ§...");
 		try {
 			if (isStart) {
-				logger.info("Êı¾İ¿âÍøÂç¼à¿ØÒÑ¾­Æô¶¯,²»ÄÜÖØ¸´Æô¶¯.");
+				logger.info("æ•°æ®åº“ç½‘ç»œç›‘æ§å·²ç»å¯åŠ¨,ä¸èƒ½é‡å¤å¯åŠ¨.");
 				return;
 			}
 			isStart = true;
 			scheduler = Executors.newSingleThreadScheduledExecutor();
 			scheduler.schedule(new DoWork(), 0L, TimeUnit.SECONDS);
-			logger.info("Æô¶¯Êı¾İ¿âÍøÂç¼à¿Ø³É¹¦.");
+			logger.info("å¯åŠ¨æ•°æ®åº“ç½‘ç»œç›‘æ§æˆåŠŸ.");
 		} finally {
 			lock.unlock();
 		}
@@ -61,14 +61,14 @@ public class DBNetWatcher {
 
 	public void stop() {
 		lock.tryLock();
-		logger.info("Í£Ö¹Êı¾İ¿âÍøÂç¼à¿Ø...");
+		logger.info("åœæ­¢æ•°æ®åº“ç½‘ç»œç›‘æ§...");
 		try {
 			if (isStart) {
 				scheduler.shutdown();
 				isStart = false;
-				logger.info("Í£Ö¹Êı¾İ¿âÍøÂç¼à¿Ø³É¹¦.");
+				logger.info("åœæ­¢æ•°æ®åº“ç½‘ç»œç›‘æ§æˆåŠŸ.");
 			} else {
-				logger.info("Êı¾İ¿âÍøÂç¼à¿ØÒÑ¾­Í£Ö¹,²»ÄÜÖØ¸´Í£Ö¹.");
+				logger.info("æ•°æ®åº“ç½‘ç»œç›‘æ§å·²ç»åœæ­¢,ä¸èƒ½é‡å¤åœæ­¢.");
 			}
 
 		} finally {
@@ -85,29 +85,29 @@ public class DBNetWatcher {
 				return;
 			}
 			try {
-				logger.info("Êı¾İ¿âÁ¬½Ó¼à¿Ø[" + counter + "]¿ªÊ¼...");
+				logger.info("æ•°æ®åº“è¿æ¥ç›‘æ§[" + counter + "]å¼€å§‹...");
 
-				logger.info("²ÉÑù¿ªÊ¼...");
+				logger.info("é‡‡æ ·å¼€å§‹...");
 				long begin = new Date().getTime();
 				dbNetDetector.sampling();
 				long end = new Date().getTime();
 				double time = (end - begin) / 1000.0;
-				logger.info("²ÉÑù½áÊø,ÓÃÊ±:" + time + "s");
+				logger.info("é‡‡æ ·ç»“æŸ,ç”¨æ—¶:" + time + "s");
 
-				logger.info("Á¬½ÓÒì³£·ÖÎö¿ªÊ¼...");
+				logger.info("è¿æ¥å¼‚å¸¸åˆ†æå¼€å§‹...");
 				begin = new Date().getTime();
 				List<DBDisConnAnalysisRS> disconnList = dbDisConnAnalyzer
 						.doing(systore.dbNet.getAllCurDBStatus());
 				end = new Date().getTime();
 				time = (end - begin) / 1000.0;
-				logger.info("Á¬½ÓÒì³£·ÖÎö½áÊø,ÓÃÊ±:" + time + "s");
+				logger.info("è¿æ¥å¼‚å¸¸åˆ†æç»“æŸ,ç”¨æ—¶:" + time + "s");
 
-				logger.info("Á¬½Ó¶¶¶¯·ÖÎö¿ªÊ¼...");
+				logger.info("è¿æ¥æŠ–åŠ¨åˆ†æå¼€å§‹...");
 				begin = new Date().getTime();
 				List<DBShakeAnalysisRS> shakeList = dbConnShakeAnalyzer.doing();
 				end = new Date().getTime();
 				time = (end - begin) / 1000.0;
-				logger.info("Á¬½Ó¶¶¶¯·ÖÎö½áÊø,ÓÃÊ±:" + time + "s");
+				logger.info("è¿æ¥æŠ–åŠ¨åˆ†æç»“æŸ,ç”¨æ—¶:" + time + "s");
 
 				for (DBDisConnAnalysisRS disconn : disconnList) {
 					for (int i = 0; i < shakeList.size(); i++) {
@@ -120,7 +120,7 @@ public class DBNetWatcher {
 				}
 
 				if (logger.isDebugEnabled()) {
-					logger.debug("Á¬½ÓÒì³£µÄÊı¾İ¿â:");
+					logger.debug("è¿æ¥å¼‚å¸¸çš„æ•°æ®åº“:");
 					logger.debug(String.format("%-6s%-6s%-6s", "ID", "AID",
 							"url"));
 					for (DBDisConnAnalysisRS disconn : disconnList) {
@@ -130,7 +130,7 @@ public class DBNetWatcher {
 								dbinfo.getId(), dbinfo.getAid(),
 								dbinfo.getUrl()));
 					}
-					logger.debug("Á¬½Ó·¢Éú¶¶¶¯µÄÊı¾İ¿â:");
+					logger.debug("è¿æ¥å‘ç”ŸæŠ–åŠ¨çš„æ•°æ®åº“:");
 					logger.debug(String.format("%-6s%-6s%-6s", "ID", "AID",
 							"url"));
 					for (DBShakeAnalysisRS shake : shakeList) {
@@ -141,7 +141,7 @@ public class DBNetWatcher {
 								dbinfo.getUrl()));
 					}
 				}
-				logger.info("¿ªÊ¼·¢ËÍÒì³£ÏûÏ¢..");
+				logger.info("å¼€å§‹å‘é€å¼‚å¸¸æ¶ˆæ¯..");
 				begin = new Date().getTime();
 				for (DBDisConnAnalysisRS disconn : disconnList) {
 					MSender.sendMsg(DISCONN_TYPE, disconn.toXML());
@@ -151,8 +151,8 @@ public class DBNetWatcher {
 				}
 				end = new Date().getTime();
 				time = (end - begin) / 1000.0;
-				logger.info("·¢ËÍÒì³£ÏûÏ¢½áÊø,ÓÃÊ±" + time + "s");
-				logger.info("Êı¾İ¿âÁ¬½Ó¼à¿Ø[" + counter + "]½áÊø.");
+				logger.info("å‘é€å¼‚å¸¸æ¶ˆæ¯ç»“æŸ,ç”¨æ—¶" + time + "s");
+				logger.info("æ•°æ®åº“è¿æ¥ç›‘æ§[" + counter + "]ç»“æŸ.");
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}

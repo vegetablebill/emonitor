@@ -37,13 +37,13 @@ public class DBSchemaTBSendMail extends SendMail {
 	@Override
 	public void beforeSend() {
 		if (logger != null) {
-			logger.info("ÉÏ´Î´¦Àí¹ıÊı¾İ¿â±í½á¹¹Òì³£ÏûÏ¢" + tb_LSMS.values().size() + "Ìõ"
-					+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:" + serializeMsgByID(tb_LSMS.values())));
+			logger.info("ä¸Šæ¬¡å¤„ç†è¿‡æ•°æ®åº“è¡¨ç»“æ„å¼‚å¸¸æ¶ˆæ¯" + tb_LSMS.values().size() + "æ¡"
+					+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:" + serializeMsgByID(tb_LSMS.values())));
 		}
 		msgs = getNeedSendMSG();
 		if (logger != null) {
-			logger.info("ĞèÒª·¢ËÍÓÊ¼şµÄÊı¾İ¿â±í½á¹¹Òì³£ÏûÏ¢" + msgs.size() + "Ìõ"
-					+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:" + serializeMsgByID(msgs)));
+			logger.info("éœ€è¦å‘é€é‚®ä»¶çš„æ•°æ®åº“è¡¨ç»“æ„å¼‚å¸¸æ¶ˆæ¯" + msgs.size() + "æ¡"
+					+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:" + serializeMsgByID(msgs)));
 		}
 
 		if (msgs == null || msgs.size() == 0) {
@@ -60,7 +60,7 @@ public class DBSchemaTBSendMail extends SendMail {
 		String user = systore.props.get(MAIL_USER);
 		String to = systore.props.get(MAIL_TO);
 		Email email = Email.create().from(user).to(to);
-		email.subject("Êı¾İ¿â±í½á¹¹Òì³£ÌáĞÑ");
+		email.subject("æ•°æ®åº“è¡¨ç»“æ„å¼‚å¸¸æé†’");
 		email.addHtml(mailContent);
 		return email;
 
@@ -69,9 +69,9 @@ public class DBSchemaTBSendMail extends SendMail {
 	@Override
 	public void afterSend(String emailID) {
 		if (msgs.size() == 0 && logger != null) {
-			logger.info("Ã»ÓĞ·¢ËÍÊı¾İ¿â±í½á¹¹Òì³£ÓÊ¼ş.");
+			logger.info("æ²¡æœ‰å‘é€æ•°æ®åº“è¡¨ç»“æ„å¼‚å¸¸é‚®ä»¶.");
 		} else if (logger != null) {
-			logger.info("·¢ËÍÊı¾İ¿â±í½á¹¹Òì³£ÓÊ¼ş³É¹¦,ÓÊ¼ş±àºÅ[" + emailID + "]");
+			logger.info("å‘é€æ•°æ®åº“è¡¨ç»“æ„å¼‚å¸¸é‚®ä»¶æˆåŠŸ,é‚®ä»¶ç¼–å·[" + emailID + "]");
 		}
 		setSended(msgs);
 		long timeFlag = new Date().getTime() - systore.props.getInMinLimit(MAIL_REPEAT_INTERVAL, 180L, 1L) * 60000;
@@ -90,8 +90,8 @@ public class DBSchemaTBSendMail extends SendMail {
 		boolean sendFlag = false;
 		List<Msg> rs = new ArrayList<Msg>();
 		List<Msg> skipMsgs = this.getUndealMS(MAIL_TYPE_TB);
-		logger.info("±¾´ÎĞèÒª´¦ÀíµÄÊı¾İ¿â±í½á¹¹Òì³£ÏûÏ¢" + skipMsgs.size() + "Ìõ"
-				+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:" + serializeMsgByID(skipMsgs)));
+		logger.info("æœ¬æ¬¡éœ€è¦å¤„ç†çš„æ•°æ®åº“è¡¨ç»“æ„å¼‚å¸¸æ¶ˆæ¯" + skipMsgs.size() + "æ¡"
+				+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:" + serializeMsgByID(skipMsgs)));
 		long time = systore.props.getInMinLimit(MAIL_REPEAT_INTERVAL, 180L, 1L) * 60000;
 		Map<String, List<Msg>> msgs_map = this.groupByDigest(skipMsgs);
 		for (String key : msgs_map.keySet()) {
@@ -132,12 +132,12 @@ public class DBSchemaTBSendMail extends SendMail {
 				tmp.append(XMLHandler.getTagValue(tbmcrs, "ct"));
 				tmp.append("&nbsp;&nbsp;</span><span class='font12'>");
 				if (Boolean.parseBoolean(XMLHandler.getTagValue(tbmcrs, "d"))) {
-					tmp.append("±»É¾³ı");
+					tmp.append("è¢«åˆ é™¤");
 				}else{
-					tmp.append("±»ĞŞ¸Ä");
+					tmp.append("è¢«ä¿®æ”¹");
 				}
 				tmp.append("</span>");
-				tmp.append("<table><tr><td>Ô­×Ö¶Î:</td><td>ÏÖ×Ö¶Î:</td></tr>");
+				tmp.append("<table><tr><td>åŸå­—æ®µ:</td><td>ç°å­—æ®µ:</td></tr>");
 				for (Node cr : XMLHandler.getNodes(XMLHandler.getSubNode(tbmcrs, "crs"), "cr")) {
 					String left = XMLHandler.getTagValue(cr, "c1");
 					String right = XMLHandler.getTagValue(cr, "c2");
@@ -156,7 +156,7 @@ public class DBSchemaTBSendMail extends SendMail {
 				}
 				tmp.append("</table></div>");
 			} catch (Exception e) {
-				logger.error("ÏûÏ¢[" + msg.id + "]½âÎöÒì³£,¶ªÆú", e);
+				logger.error("æ¶ˆæ¯[" + msg.id + "]è§£æå¼‚å¸¸,ä¸¢å¼ƒ", e);
 				db_htmls.remove(dbid);
 				skips.add(msg);
 			}
@@ -174,7 +174,7 @@ public class DBSchemaTBSendMail extends SendMail {
 				tmp.insert(0,
 						"<div><div><span class='font20'>["
 								+ dbinfo.getUrl().replaceFirst(".*@", "").replaceAll(":.*", "")
-								+ "]</span><span class='font12'>Êı¾İ¿â:</span></div><div class='tbs'>");
+								+ "]</span><span class='font12'>æ•°æ®åº“:</span></div><div class='tbs'>");
 				tmp.append("</div></div>");
 			}
 		}
@@ -182,7 +182,7 @@ public class DBSchemaTBSendMail extends SendMail {
 		sb.append("<html content='text/html; charset=gb2312'>");
 		sb.append(
 				"<style type='text/css'>body {word-wrap:break-word;word-break:normal;} .area {clear:both;} .area>div {float:left;} .font12 ,table{font-size:12px;} .font20 {font-size:20px;font-weight:bold} .tbs {margin-left:25px;width:850px;} .tbs>div {margin-top:5px;margin-bottom:10px;} table {width:100%;table-layout:fixed;border-collapse:collapse;border: 1px solid #ff00ff;} td {padding:2px;border: 1px solid #ff00ff;text-align:left;vertical-align:top;} .gred {background-color:yellow;font-weight:bold;} .bold {font-weight:bold;}</style>");
-		sb.append("<body><H1>ÒÔÏÂÇøÓò´æÔÚÊı¾İ¿â±í½á¹¹Òì³£,Çë¼°Ê±´¦Àí!!!</H1>");
+		sb.append("<body><H1>ä»¥ä¸‹åŒºåŸŸå­˜åœ¨æ•°æ®åº“è¡¨ç»“æ„å¼‚å¸¸,è¯·åŠæ—¶å¤„ç†!!!</H1>");
 		Map<Long, StringBuffer> area_htmls = new HashMap<Long, StringBuffer>();
 		for (Area area : areas) {
 			for (DBInfo dbInfo : dbinfos) {

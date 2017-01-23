@@ -38,18 +38,18 @@ public class DBSchemaTrigSendMail extends SendMail {
 	@Override
 	public void beforeSend() {
 		if (logger != null) {
-			logger.info("ÉÏ´Î´¦Àí¹ıÊı¾İ¿â´¥·¢Æ÷Òì³£ÏûÏ¢"
+			logger.info("ä¸Šæ¬¡å¤„ç†è¿‡æ•°æ®åº“è§¦å‘å™¨å¼‚å¸¸æ¶ˆæ¯"
 					+ trig_LSMS.values().size()
-					+ "Ìõ"
-					+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:"
+					+ "æ¡"
+					+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:"
 							+ serializeMsgByID(trig_LSMS.values())));
 		}
 		msgs = getNeedSendMSG();
 		if (logger != null) {
-			logger.info("ĞèÒª·¢ËÍÓÊ¼şµÄÊı¾İ¿â´¥·¢Æ÷Òì³£ÏûÏ¢"
+			logger.info("éœ€è¦å‘é€é‚®ä»¶çš„æ•°æ®åº“è§¦å‘å™¨å¼‚å¸¸æ¶ˆæ¯"
 					+ msgs.size()
-					+ "Ìõ"
-					+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:"
+					+ "æ¡"
+					+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:"
 							+ serializeMsgByID(msgs)));
 		}
 
@@ -67,7 +67,7 @@ public class DBSchemaTrigSendMail extends SendMail {
 		String user = systore.props.get(MAIL_USER);
 		String to = systore.props.get(MAIL_TO);
 		Email email = Email.create().from(user).to(to);
-		email.subject("Êı¾İ¿â´¥·¢Æ÷Òì³£ÌáĞÑ");
+		email.subject("æ•°æ®åº“è§¦å‘å™¨å¼‚å¸¸æé†’");
 		email.addHtml(mailContent);
 		return email;
 
@@ -76,9 +76,9 @@ public class DBSchemaTrigSendMail extends SendMail {
 	@Override
 	public void afterSend(String emailID) {
 		if (msgs.size() == 0 && logger != null) {
-			logger.info("Ã»ÓĞ·¢ËÍÊı¾İ¿â´¥·¢Æ÷Òì³£ÓÊ¼ş.");
+			logger.info("æ²¡æœ‰å‘é€æ•°æ®åº“è§¦å‘å™¨å¼‚å¸¸é‚®ä»¶.");
 		} else if (logger != null) {
-			logger.info("·¢ËÍÊı¾İ¿â´¥·¢Æ÷Òì³£ÓÊ¼ş³É¹¦,ÓÊ¼ş±àºÅ[" + emailID + "]");
+			logger.info("å‘é€æ•°æ®åº“è§¦å‘å™¨å¼‚å¸¸é‚®ä»¶æˆåŠŸ,é‚®ä»¶ç¼–å·[" + emailID + "]");
 		}
 		setSended(msgs);
 		long timeFlag = new Date().getTime()
@@ -99,10 +99,10 @@ public class DBSchemaTrigSendMail extends SendMail {
 		boolean sendFlag = false;
 		List<Msg> rs = new ArrayList<Msg>();
 		List<Msg> skipMsgs = this.getUndealMS(MAIL_TYPE_TRIG);
-		logger.info("±¾´ÎĞèÒª´¦ÀíµÄÊı¾İ¿â´¥·¢Æ÷Òì³£ÏûÏ¢"
+		logger.info("æœ¬æ¬¡éœ€è¦å¤„ç†çš„æ•°æ®åº“è§¦å‘å™¨å¼‚å¸¸æ¶ˆæ¯"
 				+ skipMsgs.size()
-				+ "Ìõ"
-				+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:"
+				+ "æ¡"
+				+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:"
 						+ serializeMsgByID(skipMsgs)));
 		long time = systore.props.getInMinLimit(MAIL_REPEAT_INTERVAL, 180L, 1L) * 60000;
 		Map<String, List<Msg>> msgs_map = this.groupByDigest(skipMsgs);
@@ -133,7 +133,7 @@ public class DBSchemaTrigSendMail extends SendMail {
 			try {
 				trigMetaARS = new TrigMetaAnalysisRS(msg.content);
 			} catch (Exception e) {
-				logger.error("ÏûÏ¢[" + msg.id + "]½âÎöÒì³£,¶ªÆú", e);
+				logger.error("æ¶ˆæ¯[" + msg.id + "]è§£æå¼‚å¸¸,ä¸¢å¼ƒ", e);
 				skips.add(msg);
 				continue;
 			}
@@ -151,17 +151,17 @@ public class DBSchemaTrigSendMail extends SendMail {
 			tmp.append("&nbsp;&nbsp;</span><span class='font12'>");
 			if (trigMetaARS.isDroped()) {
 				;
-				tmp.append("±»É¾³ı");
+				tmp.append("è¢«åˆ é™¤");
 			} else if (trigMetaARS.isDisabled()) {
-				tmp.append("±»½ûÓÃ");
+				tmp.append("è¢«ç¦ç”¨");
 			} else {
-				tmp.append("±»ĞŞ¸Ä");
+				tmp.append("è¢«ä¿®æ”¹");
 			}
 			tmp.append("</span>");
 			if (trigMetaARS.isDisabled()) {
 				continue;
 			}
-			tmp.append("<table><tr><td class='td1'>Ô­½á¹¹:</td><td>ÏÖ½á¹¹:</td></tr><tr><td class='td1'>");
+			tmp.append("<table><tr><td class='td1'>åŸç»“æ„:</td><td>ç°ç»“æ„:</td></tr><tr><td class='td1'>");
 			tmp.append(StringUtil.replace(trigMetaARS.getStdStrc(),
 					StringUtil.NEWLINE, "<br/>" + StringUtil.NEWLINE));
 			tmp.append("</td><td>");
@@ -186,7 +186,7 @@ public class DBSchemaTrigSendMail extends SendMail {
 						"<div><div><span class='font20'>["
 								+ dbinfo.getUrl().replaceFirst(".*@", "")
 										.replaceAll(":.*", "")
-								+ "]</span><span class='font12'>Êı¾İ¿â:</span></div><div class='trigs'>");
+								+ "]</span><span class='font12'>æ•°æ®åº“:</span></div><div class='trigs'>");
 				tmp.append("</div></div>");
 			}
 		}
@@ -194,7 +194,7 @@ public class DBSchemaTrigSendMail extends SendMail {
 		sb.append("<html content='text/html; charset=gb2312'>");
 		sb.append("<style type='text/css'>body {word-wrap:break-word;word-break:normal;} .area  {clear:both;} .area>div{float:left;} .font12 ,table{font-size:12px;} .font20 {font-size:20px;font-weight:bold} .trigs {margin-left:25px;width:850px;} .trigs>div {margin-top:5px;margin-bottom:10px;} table {width:100%;table-layout:fixed;border-collapse:collapse;border: 1px solid #ff00ff;} ");
 		sb.append("td {padding:2px;text-align:left;vertical-align:top;} .td1 {border-right:2px solid #ff00ff;}</style>");
-		sb.append("<body><H1>ÒÔÏÂÇøÓò´æÔÚÊı¾İ¿â´¥·¢Æ÷Òì³£,Çë¼°Ê±´¦Àí!!!</H1>");
+		sb.append("<body><H1>ä»¥ä¸‹åŒºåŸŸå­˜åœ¨æ•°æ®åº“è§¦å‘å™¨å¼‚å¸¸,è¯·åŠæ—¶å¤„ç†!!!</H1>");
 		Map<Long, StringBuffer> area_htmls = new HashMap<Long, StringBuffer>();
 		for (Area area : areas) {
 			for (DBInfo dbInfo : dbinfos) {

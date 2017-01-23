@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.caijun.db.DBUtil;
 import com.caijun.em.Systore;
 import com.caijun.mail.Email;
 
@@ -39,21 +40,16 @@ public abstract class SendMail {
 	public abstract void afterSend(String emailID);
 
 	protected List<Msg> getUndealMS(String type) {
-		String sql = "select id,mt,dc,mc,ms,ct from mailmessage t where mt='"
-				+ type + "' and ms=" + M_UNDEALED;
+		String sql = "select id,mt,dc,mc,ms,ct from mailmessage t where mt='" + type + "' and ms=" + M_UNDEALED;
 		List<Msg> msgs = systore.jdbc.query(sql, new MsgRowMapper());
 		return msgs;
 	}
 
 	protected List<Msg> getLatestSendMS(String type, Date begin) {
 		String sql = "select t1.id,t1.mt,t1.dc,t1.mc,t1.ms,t1.ct from mailmessage t1,"
-				+ "(select max(id) id from mailmessage t where mt='"
-				+ type
-				+ "' and ms="
-				+ M_SENDED
-				+ "and ct>=? group by dc) t2 where t1.id=t2.id";
-		List<Msg> msgs = systore.jdbc.query(sql, new Object[] { begin },
-				new MsgRowMapper());
+				+ "(select max(id) id from mailmessage t where mt='" + type + "' and ms=" + M_SENDED
+				+ " and ct>=? group by dc) t2 where t1.id=t2.id";
+		List<Msg> msgs = systore.jdbc.query(sql, new Object[] { begin }, new MsgRowMapper());
 		return msgs;
 	}
 
@@ -107,20 +103,19 @@ public abstract class SendMail {
 	}
 
 	private void setFlag(final List<Msg> msgs, final int flag) {
-		systore.jdbc.batchUpdate("update mailmessage set ms=" + flag
-				+ " where id =?", new BatchPreparedStatementSetter() {
-			@Override
-			public void setValues(PreparedStatement ps, int i)
-					throws SQLException {
-				msgs.get(i).flag = flag;
-				ps.setLong(1, msgs.get(i).id);
-			}
+		systore.jdbc.batchUpdate("update mailmessage set ms=" + flag + " where id =?",
+				new BatchPreparedStatementSetter() {
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
+						msgs.get(i).flag = flag;
+						ps.setLong(1, msgs.get(i).id);
+					}
 
-			@Override
-			public int getBatchSize() {
-				return msgs.size();
-			}
-		});
+					@Override
+					public int getBatchSize() {
+						return msgs.size();
+					}
+				});
 	}
 
 	protected class Msg {
@@ -140,7 +135,7 @@ public abstract class SendMail {
 			msg.id = rs.getLong(1);
 			msg.type = rs.getString(2);
 			msg.digest = rs.getString(3);
-			msg.content = rs.getString(4);
+			msg.content = DBUtil.readBlob(rs, 4, "utf-8");
 			msg.flag = rs.getInt(5);
 			msg.ct = rs.getTimestamp(6);
 			return msg;

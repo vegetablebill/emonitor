@@ -47,7 +47,7 @@ public class TBMetaDetector {
 		if (logger.isDebugEnabled()) {
 			for (DBInfo disconn : systore.dbNet.getAllDisconnDBInfo()) {
 				Area area = systore.getArea(disconn.getAid());
-				logger.debug("[" + area.getName() + "]Êı¾İ¿â[" + disconn.getUrl() + "]Á¬½ÓÒì³£,²»ÄÜ»ñµÃ±í½á¹¹×´Ì¬.");
+				logger.debug("[" + area.getName() + "]æ•°æ®åº“[" + disconn.getUrl() + "]è¿æ¥å¼‚å¸¸,ä¸èƒ½è·å¾—è¡¨ç»“æ„çŠ¶æ€.");
 			}
 		}
 
@@ -91,7 +91,7 @@ public class TBMetaDetector {
 			tbStatus.setId(systore.id.getNext());
 			return tbStatus;
 		} catch (Exception e) {
-			logger.error("[" + tbInfo.getDbid() + "]²»ÄÜ»ñµÃ±í[" + tbInfo.getSchema() + "." + tbInfo.getName() + "]½á¹¹×´Ì¬.",
+			logger.error("[" + tbInfo.getDbid() + "]ä¸èƒ½è·å¾—è¡¨[" + tbInfo.getSchema() + "." + tbInfo.getName() + "]ç»“æ„çŠ¶æ€.",
 					e);
 			return null;
 		}

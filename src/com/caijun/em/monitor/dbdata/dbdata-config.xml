@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="curTBDataStatus" class="java.util.concurrent.ConcurrentHashMap" />
+
+	<bean id="tbDataDetector" class="com.caijun.em.monitor.dbdata.TBDataDetector">
+		<constructor-arg name="syStore" ref="syStore" />
+		<constructor-arg name="curTBDataStatus" ref="curTBDataStatus" />
+	</bean>
+	<bean id="tbDataAnalyzer" class="com.caijun.em.monitor.dbdata.TBDataAnalyzer">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="curTBDataStatus" ref="curTBDataStatus" />
+	</bean>
+
+	<bean id="tbDataWatcher" class="com.caijun.em.monitor.dbdata.TBDataWatcher">
+		<constructor-arg name="systore" ref="syStore" />
+		<constructor-arg name="tbDataDetector" ref="tbDataDetector" />
+		<constructor-arg name="tbDataAnalyzer" ref="tbDataAnalyzer" />
+	</bean>
+
+</beans>

@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 
+import com.caijun.em.Area;
 import com.caijun.em.Systore;
 
 public class DBNetDetector {
@@ -37,8 +38,7 @@ public class DBNetDetector {
 		List<DBInfo> dbinfos = systore.dbNet.getDBInfos();
 		List<DBStatus> dbststus = new ArrayList<DBStatus>();
 		ExecutorService threadPool = Executors.newFixedThreadPool(8);
-		CompletionService<DBStatus> completionService = new ExecutorCompletionService<DBStatus>(
-				threadPool);
+		CompletionService<DBStatus> completionService = new ExecutorCompletionService<DBStatus>(threadPool);
 		for (DBInfo dbInfo : dbinfos) {
 			completionService.submit(new PingDB(dbInfo));
 		}
@@ -69,6 +69,12 @@ public class DBNetDetector {
 				dbStatus.setDisconn(false);
 			}
 		} catch (Exception e) {
+			Area area = systore.getArea(dbInfo.getAid());
+			if (area != null) {
+				logger.error("[" + area.getName() + "]数据库连接不上.");
+			} else {
+				logger.error("[" + dbInfo.getUrl() + "]连接不上.");
+			}
 			dbStatus.setDisconn(true);
 		} finally {
 			if (rs != null) {
@@ -106,17 +112,14 @@ public class DBNetDetector {
 		if (newStatus.size() == 0) {
 			return;
 		}
-		systore.jdbc.batchUpdate(
-				"insert into dbstatus(id,dbid,disconn,ct) values(?,?,?,?)",
+		systore.jdbc.batchUpdate("insert into dbstatus(id,dbid,disconn,ct) values(?,?,?,?)",
 				new BatchPreparedStatementSetter() {
 					@Override
-					public void setValues(PreparedStatement ps, int i)
-							throws SQLException {
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
 						ps.setLong(1, newStatus.get(i).getId());
 						ps.setLong(2, newStatus.get(i).getDbid());
 						ps.setInt(3, newStatus.get(i).isDisconn() ? 1 : 0);
-						ps.setTimestamp(4, new java.sql.Timestamp(newStatus
-								.get(i).getCt().getTime()));
+						ps.setTimestamp(4, new java.sql.Timestamp(newStatus.get(i).getCt().getTime()));
 					}
 
 					@Override

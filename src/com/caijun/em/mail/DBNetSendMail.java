@@ -47,23 +47,23 @@ public class DBNetSendMail extends SendMail {
 	@Override
 	public void beforeSend() {
 		if (logger != null) {
-			logger.info("ÉÏ´Î´¦Àí¹ıÊı¾İ¿âÁ¬½ÓÖĞ¶ÏÏûÏ¢"
+			logger.info("ä¸Šæ¬¡å¤„ç†è¿‡æ•°æ®åº“è¿æ¥ä¸­æ–­æ¶ˆæ¯"
 					+ disconn_LSMS.values().size()
-					+ "Ìõ"
-					+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:"
+					+ "æ¡"
+					+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:"
 							+ serializeMsgByID(disconn_LSMS.values())));
-			logger.info("ÉÏ´Î´¦Àí¹ıÊı¾İ¿âÁ¬½Ó¶¶¶¯ÏûÏ¢"
+			logger.info("ä¸Šæ¬¡å¤„ç†è¿‡æ•°æ®åº“è¿æ¥æŠ–åŠ¨æ¶ˆæ¯"
 					+ shake_LSMS.values().size()
-					+ "Ìõ"
-					+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:"
+					+ "æ¡"
+					+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:"
 							+ serializeMsgByID(shake_LSMS.values())));
 		}
 		msgs = getNeedSendMSG();
 		if (logger != null) {
-			logger.info("ĞèÒª·¢ËÍÓÊ¼şµÄÊı¾İ¿âÁ¬½ÓÒì³£ÏûÏ¢"
+			logger.info("éœ€è¦å‘é€é‚®ä»¶çš„æ•°æ®åº“è¿æ¥å¼‚å¸¸æ¶ˆæ¯"
 					+ msgs.size()
-					+ "Ìõ"
-					+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:"
+					+ "æ¡"
+					+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:"
 							+ serializeMsgByID(msgs)));
 		}
 
@@ -81,7 +81,7 @@ public class DBNetSendMail extends SendMail {
 		String user = systore.props.get(MAIL_USER);
 		String to = systore.props.get(MAIL_TO);
 		Email email = Email.create().from(user).to(to);
-		email.subject("Êı¾İ¿âÁ¬½ÓÒì³£ÌáĞÑ");
+		email.subject("æ•°æ®åº“è¿æ¥å¼‚å¸¸æé†’");
 		email.addHtml(mailContent);
 		return email;
 
@@ -90,9 +90,9 @@ public class DBNetSendMail extends SendMail {
 	@Override
 	public void afterSend(String emailID) {
 		if (msgs.size() == 0 && logger != null) {
-			logger.info("Ã»ÓĞ·¢ËÍÊı¾İ¿âÁ¬½ÓÒì³£ÓÊ¼ş.");
+			logger.info("æ²¡æœ‰å‘é€æ•°æ®åº“è¿æ¥å¼‚å¸¸é‚®ä»¶.");
 		} else if (logger != null) {
-			logger.info("·¢ËÍÊı¾İ¿âÁ¬½ÓÒì³£ÓÊ¼ş³É¹¦,ÓÊ¼ş±àºÅ[" + emailID + "]");
+			logger.info("å‘é€æ•°æ®åº“è¿æ¥å¼‚å¸¸é‚®ä»¶æˆåŠŸ,é‚®ä»¶ç¼–å·[" + emailID + "]");
 		}
 		setSended(msgs);
 		long timeFlag = new Date().getTime()
@@ -123,10 +123,10 @@ public class DBNetSendMail extends SendMail {
 		List<Msg> rs = new ArrayList<Msg>();
 		List<Msg> skipMsgs = this.getUndealMS(MAIL_TYPE_DISCONN);
 		skipMsgs.addAll(this.getUndealMS(MAIL_TYPE_SHAKE));
-		logger.info("±¾´ÎĞèÒª´¦ÀíµÄÊı¾İ¿âÁ¬½ÓÖĞ¶ÏÏûÏ¢"
+		logger.info("æœ¬æ¬¡éœ€è¦å¤„ç†çš„æ•°æ®åº“è¿æ¥ä¸­æ–­æ¶ˆæ¯"
 				+ skipMsgs.size()
-				+ "Ìõ"
-				+ (!logger.isDebugEnabled() ? "." : ",ÏûÏ¢IDÎª:"
+				+ "æ¡"
+				+ (!logger.isDebugEnabled() ? "." : ",æ¶ˆæ¯IDä¸º:"
 						+ serializeMsgByID(skipMsgs)));
 		long time = systore.props.getInMinLimit(MAIL_REPEAT_INTERVAL, 180L, 1L) * 60000;
 		Map<String, List<Msg>> msgs_map = this.groupByDigest(skipMsgs);
@@ -169,7 +169,7 @@ public class DBNetSendMail extends SendMail {
 					}
 
 				} catch (Exception e) {
-					logger.error("ÏûÏ¢[" + msg.id + "]½âÎöÒì³£,¶ªÆú", e);
+					logger.error("æ¶ˆæ¯[" + msg.id + "]è§£æå¼‚å¸¸,ä¸¢å¼ƒ", e);
 					skips.add(msg);
 					continue;
 				}
@@ -177,23 +177,23 @@ public class DBNetSendMail extends SendMail {
 				if ((disconn != null && dbInfo.getId() == disconn.getDbId())
 						|| (shake != null && dbInfo.getId() == shake.getDbId())) {
 					StringBuffer tsb = new StringBuffer();
-					tsb.append("<div><span class='font12'>Êı¾İ¿â&nbsp;&nbsp;</span><span class='font20'><b>[");
+					tsb.append("<div><span class='font12'>æ•°æ®åº“&nbsp;&nbsp;</span><span class='font20'><b>[");
 					tsb.append(dbInfo.getUrl().replaceFirst(".*@", "")
 							.replaceAll(":.*", ""));
-					tsb.append("]</b></span><span class='font12'>&nbsp;´Ó&nbsp;&nbsp;</span><span class='font20'><b>");
-					if (disconn.getCt() != null) {
+					tsb.append("]</b></span><span class='font12'>&nbsp;ä»&nbsp;&nbsp;</span><span class='font20'><b>");
+					if (disconn!=null&&disconn.getCt() != null) {
 						tsb.append(StringUtil.formatDate("yyyy-MM-dd HH:mm",
 								disconn.getCt()));
-					} else {
+					}else if(shake!=null&&shake.getCt()!=null){
 						tsb.append(StringUtil.formatDate("yyyy-MM-dd HH:mm",
 								shake.getCt()));
 					}
-					tsb.append("</b></span><span class='font12'>&nbsp;¿ªÊ¼&nbsp;&nbsp;</span><span class='font20 red'><b>");
+					tsb.append("</b></span><span class='font12'>&nbsp;å¼€å§‹&nbsp;&nbsp;</span><span class='font20 red'><b>");
 					if (MAIL_TYPE_DISCONN.equals(msg.type)) {
-						tsb.append("Á¬½ÓÖĞ¶Ï");
+						tsb.append("è¿æ¥ä¸­æ–­");
 					} else if (MAIL_TYPE_SHAKE.equals(msg.type)
 							&& !msgs_html.containsKey(dbInfo.getId())) {
-						tsb.append("Á¬½ÓÊ±¶ÏÊ±Ğø");
+						tsb.append("è¿æ¥æ—¶æ–­æ—¶ç»­");
 					}
 					tsb.append("</b></span></div>");
 					msgs_html.put(dbInfo.getId(), tsb.toString());
@@ -211,7 +211,7 @@ public class DBNetSendMail extends SendMail {
 
 		sb.append("<html content='text/html; charset=utf-8'>");
 		sb.append("<style type='text/css'>.row  {clear:both;} .row>div{float:left;} .font12 {font-size:12px;} .font20 {font-size:20px;} .red {color:red;}</style>");
-		sb.append("<body><H1>ÒÔÏÂÇøÓò´æÔÚÊı¾İ¿âÁ¬½ÓÒì³£,Çë¼°Ê±´¦Àí!!!</H1>");
+		sb.append("<body><H1>ä»¥ä¸‹åŒºåŸŸå­˜åœ¨æ•°æ®åº“è¿æ¥å¼‚å¸¸,è¯·åŠæ—¶å¤„ç†!!!</H1>");
 		for (Area area : areas) {
 			StringBuffer asb = new StringBuffer();
 			for (DBInfo dbInfo : dbinfos) {

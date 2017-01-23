@@ -36,22 +36,23 @@ public class SendMailWatcher {
 		time_interval = systore.props.getInMinLimit(TIME_INTERVAL, 1L, 1L);
 		senders = new ArrayList<SendMail>();
 		senders.add(new DBNetSendMail(systore, logger));
-		senders.add(new DBSchemaTrigSendMail(systore,logger));
-		senders.add(new DBSchemaTBSendMail(systore,logger));
+		senders.add(new DBSchemaTrigSendMail(systore, logger));
+		senders.add(new DBSchemaTBSendMail(systore, logger));
+		senders.add(new TBDataSendMail(systore, logger));
 	}
 
 	public void start() {
 		lock.tryLock();
-		logger.info("Æô¶¯ÓÊ¼ş·¢ËÍ·şÎñ...");
+		logger.info("å¯åŠ¨é‚®ä»¶å‘é€æœåŠ¡...");
 		try {
 			if (isStart) {
-				logger.info("ÓÊ¼ş·¢ËÍ·şÎñÒÑ¾­Æô¶¯,²»ÄÜÖØ¸´Æô¶¯.");
+				logger.info("é‚®ä»¶å‘é€æœåŠ¡å·²ç»å¯åŠ¨,ä¸èƒ½é‡å¤å¯åŠ¨.");
 				return;
 			}
 			isStart = true;
 			scheduler = Executors.newSingleThreadScheduledExecutor();
 			scheduler.schedule(new DoWork(), 0L, TimeUnit.SECONDS);
-			logger.info("ÆôÓÊ¼ş·¢ËÍ·şÎñ³É¹¦.");
+			logger.info("å¯é‚®ä»¶å‘é€æœåŠ¡æˆåŠŸ.");
 		} finally {
 			lock.unlock();
 		}
@@ -59,14 +60,14 @@ public class SendMailWatcher {
 
 	public void stop() {
 		lock.tryLock();
-		logger.info("Í£Ö¹ÓÊ¼ş·¢ËÍ·şÎñ...");
+		logger.info("åœæ­¢é‚®ä»¶å‘é€æœåŠ¡...");
 		try {
 			if (isStart) {
 				scheduler.shutdown();
 				isStart = false;
-				logger.info("Í£Ö¹ÓÊ¼ş·¢ËÍ·şÎñ³É¹¦.");
+				logger.info("åœæ­¢é‚®ä»¶å‘é€æœåŠ¡æˆåŠŸ.");
 			} else {
-				logger.info("ÓÊ¼ş·¢ËÍ·şÎñÒÑ¾­Í£Ö¹,²»ÄÜÖØ¸´Í£Ö¹.");
+				logger.info("é‚®ä»¶å‘é€æœåŠ¡å·²ç»åœæ­¢,ä¸èƒ½é‡å¤åœæ­¢.");
 			}
 
 		} finally {
@@ -88,7 +89,7 @@ public class SendMailWatcher {
 			double time = 0.0;
 
 			try {
-				logger.info("ÓÊ¼ş·¢ËÍ·şÎñ[" + counter + "]¿ªÊ¼...");
+				logger.info("é‚®ä»¶å‘é€æœåŠ¡[" + counter + "]å¼€å§‹...");
 				begin = new Date().getTime();
 
 				String ip = systore.props.get(MAIL_SERVER_IP, "localhost");
@@ -97,8 +98,7 @@ public class SendMailWatcher {
 				for (SendMail sender : senders) {
 					sender.beforeSend();
 				}
-				SmtpServer smtpServer = SmtpServer.create(ip).authenticateWith(
-						user, password);
+				SmtpServer smtpServer = SmtpServer.create(ip).authenticateWith(user, password);
 				SendMailSession session = smtpServer.createSession();
 				session.open();
 				for (SendMail sender : senders) {
@@ -113,7 +113,7 @@ public class SendMailWatcher {
 
 				end = new Date().getTime();
 				time = (end - begin) / 1000.0;
-				logger.info("ÓÊ¼ş·¢ËÍ·şÎñ[" + counter + "]½áÊø,ÓÃÊ±" + time + "s");
+				logger.info("é‚®ä»¶å‘é€æœåŠ¡[" + counter + "]ç»“æŸ,ç”¨æ—¶" + time + "s");
 
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);

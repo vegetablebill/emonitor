@@ -27,12 +27,17 @@ public class DBConnShakeAnalyzer {
 		int time_interval = systore.props.getInMinLimit(TIME_INTERVAL, 60, 1);
 		int detect_time_interval = systore.props.getInMinLimit(
 				DETECT_TIME_INTERVAL, 5, 1);
-		int disconnCount = time_interval / detect_time_interval - 1;
+		int disconnCount = time_interval / (detect_time_interval*2) - 2;
 		if (disconnCount < 1) {
 			disconnCount = 1;
 		}
+		//oracle
+//		String sql = "select dbid,ct from"
+//				+ "(select dbid,count(dbid) c,min(ct) ct from dbstatus t where t.disconn = 1 and t.ct > sysdate-?/24/60 group by dbid) "
+//				+ "where c>=?";
+		//MySQL
 		String sql = "select dbid,ct from"
-				+ "(select dbid,count(dbid) c,min(ct) ct from dbstatus t where t.disconn = 1 and t.ct > sysdate-?/24/60 group by dbid) "
+				+ "(select dbid,count(dbid) c,min(ct) ct from dbstatus t where t.disconn = 1 and t.ct > current_timestamp()-?*60 group by dbid) a "
 				+ "where c>=?";
 		return systore.jdbc.query(sql, new Object[] { time_interval,
 				disconnCount }, new DBShakeAnalysisRSMapper());

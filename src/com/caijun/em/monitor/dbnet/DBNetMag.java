@@ -39,14 +39,14 @@ public class DBNetMag {
 		jdbcCache = jdbcs;
 		this.curStatus = curStatus;
 
-		logger.debug("[DBNetMag]¿ªÊ¼¼ÓÔØ»º´æ...");
+		logger.debug("[DBNetMag]å¼€å§‹åŠ è½½ç¼“å­˜...");
 		long begin = new Date().getTime();
 		load_dbInfosCache();
 		load_dbdssCache();
 		load_curdbstatus();
 		long end = new Date().getTime();
 		double time = (end - begin) / 1000.0;
-		logger.debug("[DBNetMag]¼ÓÔØ»º´æÍê³É,ÓÃÊ±:" + time + "s");
+		logger.debug("[DBNetMag]åŠ è½½ç¼“å­˜å®Œæˆ,ç”¨æ—¶:" + time + "s");
 
 	}
 

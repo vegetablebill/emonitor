@@ -35,14 +35,14 @@ public class LogMag implements BeanPostProcessor {
 	public LogMag(JdbcTemplate jdbc) {
 		super();
 		long begin = new Date().getTime();
-		logger.debug("[LogMag]¿ªÊ¼¼ÓÔØ...");
+		logger.debug("[LogMag]å¼€å§‹åŠ è½½...");
 		this.jdbc = jdbc;
 		logConfig_cache = new HashMap<String, LogConfig>();
 		rollingFile_param_p = Pattern.compile(ROLLINGFILE_PARAM_P);
 		init();
 		long end = new Date().getTime();
 		double time = (end - begin) / 1000.0;
-		logger.debug("[LogMag]¼ÓÔØÍê³É,ÓÃÊ±:" + time + "s");
+		logger.debug("[LogMag]åŠ è½½å®Œæˆ,ç”¨æ—¶:" + time + "s");
 
 	}
 

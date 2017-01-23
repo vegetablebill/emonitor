@@ -42,16 +42,16 @@ public class DBTBSchemaWatcher {
 
 	public void start() {
 		lock.tryLock();
-		logger.info("Æô¶¯Êı¾İ¿â±í½á¹¹¼à¿Ø...");
+		logger.info("å¯åŠ¨æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§...");
 		try {
 			if (isStart) {
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿ØÒÑ¾­Æô¶¯,²»ÄÜÖØ¸´Æô¶¯.");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§å·²ç»å¯åŠ¨,ä¸èƒ½é‡å¤å¯åŠ¨.");
 				return;
 			}
 			isStart = true;
 			scheduler = Executors.newSingleThreadScheduledExecutor();
 			scheduler.schedule(new DoWork(), 0L, TimeUnit.SECONDS);
-			logger.info("Æô¶¯Êı¾İ¿â±í½á¹¹¼à¿Ø³É¹¦.");
+			logger.info("å¯åŠ¨æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§æˆåŠŸ.");
 		} finally {
 			lock.unlock();
 		}
@@ -59,14 +59,14 @@ public class DBTBSchemaWatcher {
 
 	public void stop() {
 		lock.tryLock();
-		logger.info("Í£Ö¹Êı¾İ¿â±í½á¹¹¼à¿Ø...");
+		logger.info("åœæ­¢æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§...");
 		try {
 			if (isStart) {
 				scheduler.shutdown();
 				isStart = false;
-				logger.info("Í£Ö¹Êı¾İ¿â±í½á¹¹¼à¿Ø³É¹¦.");
+				logger.info("åœæ­¢æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§æˆåŠŸ.");
 			} else {
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿ØÒÑ¾­Í£Ö¹,²»ÄÜÖØ¸´Í£Ö¹.");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§å·²ç»åœæ­¢,ä¸èƒ½é‡å¤åœæ­¢.");
 			}
 
 		} finally {
@@ -83,37 +83,37 @@ public class DBTBSchemaWatcher {
 				return;
 			}
 			try {
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]¿ªÊ¼...");
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]²ÉÑù¿ªÊ¼...");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]å¼€å§‹...");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]é‡‡æ ·å¼€å§‹...");
 				long begin = new Date().getTime();
 				tbMetaDetector.sampling();
 				long end = new Date().getTime();
 				double time = (end - begin) / 1000.0;
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]²ÉÑù½áÊø,ÓÃÊ±:" + time + "s");
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]·ÖÎö¿ªÊ¼...");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]é‡‡æ ·ç»“æŸ,ç”¨æ—¶:" + time + "s");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]åˆ†æå¼€å§‹...");
 				begin = new Date().getTime();
 				List<TBMetaAnalysisRS> tbMetaRSList = tbMetaAnalyzer
 						.doing(systore.dbSchema.getAllCurTBStatus());
 				end = new Date().getTime();
 				time = (end - begin) / 1000.0;
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]·ÖÎö½áÊø,ÓÃÊ±:" + time + "s");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]åˆ†æç»“æŸ,ç”¨æ—¶:" + time + "s");
 
 				if (logger.isDebugEnabled()) {
-					logger.debug("·¢Éú±ä»¯µÄ±í:");
+					logger.debug("å‘ç”Ÿå˜åŒ–çš„è¡¨:");
 					for (TBMetaAnalysisRS tbMetaRS : tbMetaRSList) {
 						logger.debug(tbMetaRS.getName());
 					}
 				}
 
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]¿ªÊ¼·¢ËÍÒì³£ÏûÏ¢..");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]å¼€å§‹å‘é€å¼‚å¸¸æ¶ˆæ¯..");
 				begin = new Date().getTime();
 				for (TBMetaAnalysisRS tbMetaRS : tbMetaRSList) {
 					MSender.sendMsg(TB_TYPE, tbMetaRS.toXML());
 				}
 				end = new Date().getTime();
 				time = (end - begin) / 1000.0;
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]·¢ËÍÒì³£ÏûÏ¢½áÊø,ÓÃÊ±" + time + "s");
-				logger.info("Êı¾İ¿â±í½á¹¹¼à¿Ø[" + counter + "]½áÊø.");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]å‘é€å¼‚å¸¸æ¶ˆæ¯ç»“æŸ,ç”¨æ—¶" + time + "s");
+				logger.info("æ•°æ®åº“è¡¨ç»“æ„ç›‘æ§[" + counter + "]ç»“æŸ.");
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}

@@ -42,14 +42,14 @@ public class DBSchemaMag {
 		this.curTrigStatus = curTrigStatus;
 
 		long begin = new Date().getTime();
-		logger.debug("[DBSchemaMag]ø™ ºº”‘ÿª∫¥Ê...");
+		logger.debug("[DBSchemaMag]ÂºÄÂßãÂä†ËΩΩÁºìÂ≠ò...");
 		load_tbinfosCache();
 		load_triginfosCache();
 		load_tbstatusCache();
 		load_trigstatusCache();
 		long end = new Date().getTime();
 		double time = (end - begin) / 1000.0;
-		logger.debug("[DBSchemaMag]º”‘ÿª∫¥ÊÕÍ≥…,”√ ±:" + time + "s");
+		logger.debug("[DBSchemaMag]Âä†ËΩΩÁºìÂ≠òÂÆåÊàê,Áî®Êó∂:" + time + "s");
 
 	}
 
@@ -92,7 +92,7 @@ public class DBSchemaMag {
 		schema = StringUtil.toLowerCase(StringUtil.trimDown(schema));
 		tbName = StringUtil.toLowerCase(StringUtil.trimDown(tbName));
 		jdbc.execute(
-				"delete from TBS where dbid=" + dbid + "and tbschema='" + schema + "' and tbname='" + tbName + "'");
+				"delete from TBS where dbid=" + dbid + " and tbschema='" + schema + "' and tbname='" + tbName + "'");
 		TBInfo tbInfo = getTBInfo(dbid, schema, tbName);
 		if (tbInfo != null) {
 			tbInfosCache.remove(tbInfo.getId());
@@ -145,7 +145,7 @@ public class DBSchemaMag {
 		try {
 			tbMeta = new TBMeta(schema, tbName, dbNet.getDS(dbid));
 		} catch (DBMetaException e) {
-			logger.error("Ω‚Œˆ[" + schema + "." + tbName + "]“Ï≥£.", e);
+			logger.error("Ëß£Êûê[" + schema + "." + tbName + "]ÂºÇÂ∏∏.", e);
 			removeTBInfo(dbid, schema, tbName);
 			return null;
 		}
@@ -171,7 +171,7 @@ public class DBSchemaMag {
 			}
 			return tbInfo;
 		} catch (Exception e) {
-			logger.error("±£¥Ê[" + schema + "." + tbName + "]‘™–≈œ¢“Ï≥£.", e);
+			logger.error("‰øùÂ≠ò[" + schema + "." + tbName + "]ÂÖÉ‰ø°ÊÅØÂºÇÂ∏∏.", e);
 			return null;
 		}
 
@@ -211,7 +211,7 @@ public class DBSchemaMag {
 		try {
 			trigMeta = new TrigMeta(schema, trigName, dbNet.getDS(dbid));
 		} catch (DBMetaException e) {
-			logger.error("Ω‚Œˆ[" + schema + "." + tbName + "." + trigName + "]“Ï≥£.", e);
+			logger.error("Ëß£Êûê[" + schema + "." + tbName + "." + trigName + "]ÂºÇÂ∏∏.", e);
 			removeTrigInfo(dbid, schema, trigName);
 			return null;
 		}
@@ -238,7 +238,7 @@ public class DBSchemaMag {
 			}
 			return trigInfo;
 		} catch (Exception e) {
-			logger.error("±£¥Ê[" + schema + "." + tbName + "." + trigName + "]‘™–≈œ¢“Ï≥£.", e);
+			logger.error("‰øùÂ≠ò[" + schema + "." + tbName + "." + trigName + "]ÂÖÉ‰ø°ÊÅØÂºÇÂ∏∏.", e);
 			return null;
 		}
 	}
@@ -369,7 +369,7 @@ public class DBSchemaMag {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} catch (DBMetaException e) {
-				logger.error("Ω‚Œˆ[" + tbInfo.getSchema() + "." + tbInfo.getName() + "]“Ï≥£.", e);
+				logger.error("Ëß£Êûê[" + tbInfo.getSchema() + "." + tbInfo.getName() + "]ÂºÇÂ∏∏.", e);
 			}
 			return tbInfo;
 		}
@@ -401,8 +401,8 @@ public class DBSchemaMag {
 			} catch (SQLException e) {
 				logger.error(e.getMessage(), e);
 			} catch (DBMetaException e) {
-				logger.error("Ω‚Œˆ[" + trigInfo.getSchema() + "." + trigInfo.getTbName() + "." + trigInfo.getTrigName()
-						+ "]“Ï≥£.", e);
+				logger.error("Ëß£Êûê[" + trigInfo.getSchema() + "." + trigInfo.getTbName() + "." + trigInfo.getTrigName()
+						+ "]ÂºÇÂ∏∏.", e);
 			}
 			return trigInfo;
 		}

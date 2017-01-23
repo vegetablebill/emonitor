@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -13,7 +12,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class Props {
 	private JdbcTemplate jdbc; 
 	private ConcurrentHashMap<String, String> propsCache;
-	private Logger logger = Logger.getRootLogger();
 	
 	
 	

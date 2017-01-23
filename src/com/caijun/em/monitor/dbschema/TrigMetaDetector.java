@@ -49,7 +49,7 @@ public class TrigMetaDetector {
 		if (logger.isDebugEnabled()) {
 			for (DBInfo disconn : systore.dbNet.getAllDisconnDBInfo()) {
 				Area area = systore.getArea(disconn.getAid());
-				logger.debug("[" + area.getName() + "]Êı¾İ¿â[" + disconn.getUrl() + "]Á¬½ÓÒì³£,²»ÄÜ»ñµÃ´¥·¢Æ÷½á¹¹×´Ì¬.");
+				logger.debug("[" + area.getName() + "]æ•°æ®åº“[" + disconn.getUrl() + "]è¿æ¥å¼‚å¸¸,ä¸èƒ½è·å¾—è§¦å‘å™¨ç»“æ„çŠ¶æ€.");
 			}
 		}
 
@@ -108,8 +108,8 @@ public class TrigMetaDetector {
 			trigStatus.setId(systore.id.getNext());
 			return trigStatus;
 		} catch (Exception e) {
-			logger.error("[" + trigInfo.getDbid() + "]²»ÄÜ»ñµÃ´¥·¢Æ÷[" + trigInfo.getSchema() + "." + trigInfo.getTbName()
-					+ "." + trigInfo.getTrigName() + "]½á¹¹×´Ì¬.", e);
+			logger.error("[" + trigInfo.getDbid() + "]ä¸èƒ½è·å¾—è§¦å‘å™¨[" + trigInfo.getSchema() + "." + trigInfo.getTbName()
+					+ "." + trigInfo.getTrigName() + "]ç»“æ„çŠ¶æ€.", e);
 			return null;
 		}
 	}
